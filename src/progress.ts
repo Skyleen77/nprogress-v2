@@ -9,7 +9,7 @@ import {
 } from './utils';
 
 export class NProgress {
-  static settings: NProgressOptions = {
+  static settings: Required<NProgressOptions> = {
     minimum: 0.08,
     maximum: 1,
     template: `<div class="bar" role="bar"><div class="peg"></div></div><div class="spinner" role="spinner"><div class="spinner-icon"></div></div>`,

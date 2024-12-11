@@ -1,0 +1,19 @@
+{
+  "name": "nprogress-v2",
+  "version": "1.0.0",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "lint": "eslint . --max-warnings 0",
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.56.5",
+    "@types/node": "^20.17.10",
+    "eslint": "^8.57.0",
+    "tsup": "^8.3.5",
+    "typescript": "5.5.4"
+  }
+}

@@ -164,7 +164,7 @@ The included CSS file is pretty minimal... in fact, feel free to scrap it and ma
 
 ## Issues
 
-If you encounter any problems, do not hesitate to [open an issue](https://github.com/Skyleen77/nprogress-v2) or make a PR [here](https://github.com/Skyleen77/nprogress-v2).
+If you encounter any problems, do not hesitate to [open an issue](https://github.com/Skyleen77/nprogress-v2/issues) or make a PR [here](https://github.com/Skyleen77/nprogress-v2).
 
 ## LICENSE
 

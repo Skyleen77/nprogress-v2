@@ -1,6 +1,16 @@
 {
   "name": "nprogress-v2",
   "version": "1.0.3",
+  "description": "NProgress updated with additional functionality",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Skyleen77/nprogress-v2.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Skyleen77/nprogress-v2/issues"
+  },
+  "author": "Skyleen",
+  "license": "MIT",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

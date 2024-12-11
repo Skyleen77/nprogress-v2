@@ -1,4 +1,4 @@
-NProgress V2
+# NProgress V2
 
 **NProgress, which has not been maintained for over 4 years, requires a maintained V2 with recent code.**
 
@@ -35,9 +35,9 @@ NProgress.done();
 number between `0..1`.
 
 ```js
-NProgress.set(0.0); // Sorta same as .start()
+NProgress.set(0.0); // Sort a same as .start()
 NProgress.set(0.4);
-NProgress.set(1.0); // Sorta same as .done()
+NProgress.set(1.0); // Sort a same as .done()
 ```
 
 **Incrementing:** To increment the progress bar, just use `.inc()`. This

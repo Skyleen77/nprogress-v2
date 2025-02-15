@@ -16,7 +16,7 @@ export class NProgress {
     template: `<div class="bar" role="bar"><div class="peg"></div></div>
                <div class="spinner" role="spinner"><div class="spinner-icon"></div></div>`,
     easing: 'linear',
-    positionUsing: null,
+    positionUsing: '',
     speed: 200,
     trickle: true,
     trickleSpeed: 200,
@@ -67,9 +67,6 @@ export class NProgress {
 
     // Queue the animation function
     this.queue((next: () => void) => {
-      if (this.settings.positionUsing === null) {
-        this.settings.positionUsing = this.getPositioningCSS();
-      }
       // Animate the bar on all progress elements
       progressElements.forEach((progress) => {
         const bar = progress.querySelector(
@@ -355,6 +352,12 @@ export class NProgress {
     if (fn) fn(this.next.bind(this));
   }
 
+  private static initPositionUsing(): void {
+    if (this.settings.positionUsing === '') {
+      this.settings.positionUsing = this.getPositioningCSS();
+    }
+  }
+
   // Compute the CSS for positioning the bar
   private static barPositionCSS({
     n,
@@ -367,6 +370,8 @@ export class NProgress {
     ease: string;
     perc?: number;
   }): { [key: string]: string } {
+    this.initPositionUsing();
+
     let barCSS: { [key: string]: string } = {};
 
     const computedPerc = perc ?? toBarPerc(n, this.settings.direction);
@@ -390,7 +395,7 @@ export class NProgress {
           ? { right: '0', left: 'auto' }
           : {}),
       };
-    } else {
+    } else if (this.settings.positionUsing === 'margin') {
       barCSS =
         this.settings.direction === 'rtl'
           ? { 'margin-left': `${-computedPerc}%` }

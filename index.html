@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" type="text/css" href="dist/index.css" />
+    <title>NProgress Test</title>
+  </head>
+  <body>
+    <h1>NProgress Test</h1>
+
+    <div class="nprogress">
+      <div class="bar" role="bar">
+        <div class="peg"></div>
+      </div>
+      <div class="spinner" role="spinner">
+        <div class="spinner-icon"></div>
+      </div>
+    </div>
+
+    <button id="start-btn">Start</button>
+    <button id="inc-btn">Increment</button>
+    <button id="done-btn">Done</button>
+
+    <script type="module" src="dist/index.mjs"></script>
+    <script type="module">
+      NProgress.configure({
+        template: null,
+      });
+
+      document
+        .getElementById('start-btn')
+        .addEventListener('click', function () {
+          NProgress.start();
+        });
+
+      document.getElementById('inc-btn').addEventListener('click', function () {
+        NProgress.inc(0.2);
+      });
+
+      document
+        .getElementById('done-btn')
+        .addEventListener('click', function () {
+          NProgress.done();
+        });
+
+      window.addEventListener('load', function () {
+        NProgress.start();
+
+        setTimeout(function () {
+          NProgress.done();
+        }, 2000);
+      });
+    </script>
+  </body>
+</html>

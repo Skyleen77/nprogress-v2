@@ -85,19 +85,40 @@ NProgress.configure({ maximum: 0.9 });
 #### `template`
 
 You can change the markup using `template`. To keep the progress
-bar working, keep an element with `role='bar'` in there. See the [default template]
-for reference.
+bar working, keep an element with `role='bar'` in there.
 
 ```js
 NProgress.configure({
-  template: "<div class='....'>...</div>",
+  template: `<div class="bar" role="bar"><div class="peg"></div></div><div class="spinner" role="spinner"><div class="spinner-icon"></div></div>`,
 });
 ```
 
+You can also set the template to `null` to use your own template in your code.
+
+```js
+NProgress.configure({
+  template: null,
+});
+```
+
+In your code, you can use the following template:
+
+```html
+<div class="nprogress">
+  <div class="bar" role="bar">
+    <div class="peg"></div>
+  </div>
+  <div class="spinner" role="spinner">
+    <div class="spinner-icon"></div>
+  </div>
+</div>
+```
+
+_Note: You can add multiple templates in your code to have multiple progress bars._
+
 #### `easing` and `speed`
 
-Adjust animation settings using _easing_ (a CSS easing string)
-and _speed_ (in ms). (default: `ease` and `200`)
+Adjust animation settings using _easing_ (a CSS easing string) and _speed_ (in ms). (default: `ease` and `200`)
 
 ```js
 NProgress.configure({ easing: 'ease', speed: 500 });

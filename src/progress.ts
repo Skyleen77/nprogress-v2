@@ -12,7 +12,9 @@ export class NProgress {
   static settings: Required<NProgressOptions> = {
     minimum: 0.08,
     maximum: 1,
-    template: `<div class="bar" role="bar"><div class="peg"></div></div><div class="spinner" role="spinner"><div class="spinner-icon"></div></div>`,
+    // If template is null, the user can insert their own template in the DOM.
+    template: `<div class="bar" role="bar"><div class="peg"></div></div>
+               <div class="spinner" role="spinner"><div class="spinner-icon"></div></div>`,
     easing: 'linear',
     positionUsing: '',
     speed: 200,
@@ -41,46 +43,57 @@ export class NProgress {
     return typeof this.status === 'number';
   }
 
-  // Set the progress status
+  /**
+   * Set the progress status.
+   * This method updates the progress status for every progress element present in the DOM.
+   * If a template is provided, it will create a new progress element if one does not already exist.
+   * If the template is null, it relies on user-inserted elements.
+   */
   static set(n: number): typeof NProgress {
     if (this.isPaused) return this;
 
     const started = this.isStarted();
-
-    // Limiter `n` entre `minimum` et `maximum`
+    // Clamp n between minimum and maximum
     n = clamp(n, this.settings.minimum, this.settings.maximum);
+    // Reset status if maximum is reached
     this.status = n === this.settings.maximum ? null : n;
 
-    const progress = this.render(!started);
-    const bar = progress.querySelector(
-      this.settings.barSelector,
-    ) as HTMLElement;
+    const progressElements = this.render(!started);
     const speed = this.settings.speed;
     const ease = this.settings.easing;
 
-    progress.offsetWidth; // Repaint
+    // Force repaint on each element
+    progressElements.forEach((progress) => progress.offsetWidth);
 
+    // Queue the animation function
     this.queue((next: () => void) => {
-      // Determine the CSS positioning to use
       if (this.settings.positionUsing === '') {
         this.settings.positionUsing = this.getPositioningCSS();
       }
-
-      // Apply styles to animate the bar
-      css(bar, this.barPositionCSS(n, speed, ease));
+      // Animate the bar on all progress elements
+      progressElements.forEach((progress) => {
+        const bar = progress.querySelector(
+          this.settings.barSelector,
+        ) as HTMLElement;
+        css(bar, this.barPositionCSS(n, speed, ease));
+      });
 
       if (n === this.settings.maximum) {
-        // Si la barre atteint `maximum`, la rendre semi-transparente pour indiquer la limite atteinte
-        css(progress, { transition: 'none', opacity: '1' });
-        progress.offsetWidth; // Repaint
-
+        // When the bar reaches maximum, make it semi-transparent to indicate completion
+        progressElements.forEach((progress) => {
+          css(progress, { transition: 'none', opacity: '1' });
+          progress.offsetWidth; // Repaint
+        });
         setTimeout(() => {
-          css(progress, {
-            transition: `all ${speed}ms linear`,
-            opacity: '0.5',
+          progressElements.forEach((progress) => {
+            css(progress, {
+              transition: `all ${speed}ms linear`,
+              opacity: '0.5',
+            });
           });
           setTimeout(() => {
-            this.remove();
+            // Remove each progress element from the DOM
+            progressElements.forEach((progress) => this.remove(progress));
             next();
           }, speed);
         }, speed);
@@ -92,13 +105,12 @@ export class NProgress {
     return this;
   }
 
-  // Start the progress
+  // Start the progress bar
   static start(): typeof NProgress {
     if (!this.status) this.set(0);
 
     const work = () => {
       if (this.isPaused) return;
-
       setTimeout(() => {
         if (!this.status) return;
         this.trickle();
@@ -114,7 +126,6 @@ export class NProgress {
   // Complete the progress
   static done(force?: boolean): typeof NProgress {
     if (!force && !this.status) return this;
-
     return this.inc(0.3 + 0.5 * Math.random()).set(1);
   }
 
@@ -142,16 +153,14 @@ export class NProgress {
           amount = 0;
         }
       }
-
       n = clamp(n + amount, 0, 0.994);
       return this.set(n);
     }
   }
 
-  // Advance the progress
+  // Advance the progress (trickle)
   static trickle(): typeof NProgress {
     if (this.isPaused) return this;
-
     return this.inc();
   }
 
@@ -184,60 +193,103 @@ export class NProgress {
     return this;
   }
 
-  // Render the NProgress component
-  static render(fromStart: boolean = false): HTMLElement {
-    if (this.isRendered()) {
-      return document.getElementById('nprogress') as HTMLElement;
-    }
-
-    addClass(document.documentElement, 'nprogress-busy');
-
-    const progress = document.createElement('div');
-    progress.id = 'nprogress';
-    progress.innerHTML = this.settings.template;
-
-    const bar = progress.querySelector(
-      this.settings.barSelector,
-    ) as HTMLElement;
-    const perc = fromStart
-      ? toBarPerc(0, this.settings.direction)
-      : `${toBarPerc(this.status || 0, this.settings.direction)}`;
+  /**
+   * Renders the NProgress component.
+   * If a template is provided, it will create a progress element if none exists in the parent.
+   * If the template is null, it relies on the user to insert their own elements marked with the "nprogress" class.
+   */
+  static render(fromStart: boolean = false): HTMLElement[] {
     const parent =
       typeof this.settings.parent === 'string'
         ? document.querySelector(this.settings.parent)
         : this.settings.parent;
+    let progressElements: HTMLElement[] = parent
+      ? Array.from((parent as HTMLElement).querySelectorAll('.nprogress'))
+      : [];
 
-    css(bar, {
-      transition: 'all 0 linear',
-      transform: `translate3d(${perc}%,0,0)`,
+    // If a template is provided and no progress element exists, create one.
+    if (this.settings.template !== null && progressElements.length === 0) {
+      addClass(document.documentElement, 'nprogress-busy');
+
+      const progress = document.createElement('div');
+      // Use a class instead of an id to allow multiple progress elements
+      addClass(progress, 'nprogress');
+      progress.innerHTML = this.settings.template;
+
+      if (parent !== document.body) {
+        addClass(parent as HTMLElement, 'nprogress-custom-parent');
+      }
+
+      (parent as HTMLElement).appendChild(progress);
+      progressElements.push(progress);
+    }
+
+    // Common initialization logic for all progress elements
+    progressElements.forEach((progress) => {
+      // If using user-provided templates (template === null), ensure the element is visible
+      if (this.settings.template === null) {
+        progress.style.display = '';
+      }
+      addClass(document.documentElement, 'nprogress-busy');
+      if (parent !== document.body) {
+        addClass(parent as HTMLElement, 'nprogress-custom-parent');
+      }
+      const bar = progress.querySelector(
+        this.settings.barSelector,
+      ) as HTMLElement;
+      const perc = fromStart
+        ? toBarPerc(0, this.settings.direction)
+        : `${toBarPerc(this.status || 0, this.settings.direction)}`;
+      css(bar, {
+        transition: 'all 0 linear',
+        transform: `translate3d(${perc}%,0,0)`,
+      });
+      if (!this.settings.showSpinner) {
+        const spinner = progress.querySelector(
+          this.settings.spinnerSelector,
+        ) as HTMLElement;
+        spinner && removeElement(spinner);
+      }
     });
 
-    if (!this.settings.showSpinner) {
-      const spinner = progress.querySelector(
-        this.settings.spinnerSelector,
-      ) as HTMLElement;
-      spinner && removeElement(spinner);
-    }
-
-    if (parent !== document.body) {
-      addClass(parent as HTMLElement, 'nprogress-custom-parent');
-    }
-
-    (parent as HTMLElement).appendChild(progress);
-    return progress;
+    return progressElements;
   }
 
-  // Remove NProgress from the DOM
-  static remove(): void {
-    removeClass(document.documentElement, 'nprogress-busy');
-    const parent =
-      typeof this.settings.parent === 'string'
-        ? document.querySelector(this.settings.parent)
-        : this.settings.parent;
-    removeClass(parent as HTMLElement, 'nprogress-custom-parent');
-
-    const progress = document.getElementById('nprogress');
-    progress && removeElement(progress);
+  /**
+   * Remove the progress element from the DOM.
+   * If a progress element is provided, only that element is removed;
+   * otherwise, all progress elements and associated classes are removed.
+   * For user-provided templates (when settings.template === null), the element
+   * is hidden instead of being removed.
+   */
+  static remove(progressElement?: HTMLElement): void {
+    if (progressElement) {
+      if (this.settings.template === null) {
+        // For user-provided templates, hide the element instead of removing it.
+        progressElement.style.display = 'none';
+      } else {
+        removeElement(progressElement);
+      }
+    } else {
+      removeClass(document.documentElement, 'nprogress-busy');
+      const parent =
+        typeof this.settings.parent === 'string'
+          ? document.querySelectorAll(this.settings.parent)
+          : [this.settings.parent];
+      parent.forEach((p: Element) => {
+        removeClass(p as HTMLElement, 'nprogress-custom-parent');
+      });
+      const progresses = document.querySelectorAll('.nprogress');
+      progresses.forEach((progress) => {
+        const elem = progress as HTMLElement;
+        if (this.settings.template === null) {
+          // Hide the element instead of removing it.
+          elem.style.display = 'none';
+        } else {
+          removeElement(elem);
+        }
+      });
+    }
   }
 
   // Pause the progress
@@ -254,13 +306,12 @@ export class NProgress {
 
   // Check if NProgress is rendered in the DOM
   static isRendered(): boolean {
-    return !!document.getElementById('nprogress');
+    return document.querySelectorAll('.nprogress').length > 0;
   }
 
   // Determine the CSS positioning method to use
   static getPositioningCSS(): string {
     const bodyStyle = document.body.style;
-
     const vendorPrefix =
       'WebkitTransform' in bodyStyle
         ? 'Webkit'
@@ -317,3 +368,6 @@ export class NProgress {
     return barCSS;
   }
 }
+
+export default NProgress;
+window.NProgress = NProgress;

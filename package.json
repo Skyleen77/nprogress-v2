@@ -1,6 +1,6 @@
 {
   "name": "nprogress-v2",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "NProgress updated with additional functionality",
   "repository": {
     "type": "git",
@@ -20,7 +20,8 @@
   "scripts": {
     "lint": "eslint . --max-warnings 0",
     "build": "tsup",
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "pub:release": "pnpm publish --no-git-checks --access public"
   },
   "devDependencies": {
     "@types/eslint": "^8.56.5",

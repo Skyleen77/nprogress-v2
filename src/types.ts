@@ -1,9 +1,11 @@
+import type NProgress from './progress';
+
 export type NProgressDirection = 'ltr' | 'rtl';
 
 export interface NProgressOptions {
   minimum?: number;
   maximum?: number;
-  template?: string;
+  template?: string | null;
   easing?: string;
   speed?: number;
   trickle?: boolean;
@@ -14,4 +16,10 @@ export interface NProgressOptions {
   barSelector?: string;
   spinnerSelector?: string;
   direction?: NProgressDirection;
+}
+
+declare global {
+  interface Window {
+    NProgress: NProgress;
+  }
 }

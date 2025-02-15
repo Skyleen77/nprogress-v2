@@ -404,8 +404,6 @@ export class NProgress {
 
     barCSS.transition = `all ${speed}ms ${ease}`;
 
-    console.log('barCSS', barCSS);
-
     return barCSS;
   }
 }

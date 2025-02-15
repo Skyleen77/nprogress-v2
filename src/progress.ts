@@ -16,7 +16,7 @@ export class NProgress {
     template: `<div class="bar" role="bar"><div class="peg"></div></div>
                <div class="spinner" role="spinner"><div class="spinner-icon"></div></div>`,
     easing: 'linear',
-    positionUsing: '',
+    positionUsing: null,
     speed: 200,
     trickle: true,
     trickleSpeed: 200,
@@ -67,7 +67,7 @@ export class NProgress {
 
     // Queue the animation function
     this.queue((next: () => void) => {
-      if (this.settings.positionUsing === '') {
+      if (this.settings.positionUsing === null) {
         this.settings.positionUsing = this.getPositioningCSS();
       }
       // Animate the bar on all progress elements
@@ -75,10 +75,9 @@ export class NProgress {
         const bar = progress.querySelector(
           this.settings.barSelector,
         ) as HTMLElement;
-        css(bar, this.barPositionCSS(n, speed, ease));
+        css(bar, this.barPositionCSS({ n, speed, ease }));
       });
 
-      console.log('n:', n, 'this.settings.maximum:', this.settings.maximum);
       if (n === this.settings.maximum) {
         // When the bar reaches maximum, make it semi-transparent to indicate completion
         progressElements.forEach((progress) => {
@@ -88,7 +87,7 @@ export class NProgress {
         setTimeout(() => {
           progressElements.forEach((progress) => {
             css(progress, {
-              transition: `all ${speed}ms linear`,
+              transition: `all ${speed}ms ${ease}`,
               opacity: '0',
             });
           });
@@ -246,11 +245,17 @@ export class NProgress {
       ) as HTMLElement;
       const perc = fromStart
         ? toBarPerc(0, this.settings.direction)
-        : `${toBarPerc(this.status || 0, this.settings.direction)}`;
-      css(bar, {
-        transition: 'all 0 linear',
-        transform: `translate3d(${perc}%,0,0)`,
-      });
+        : toBarPerc(this.status || 0, this.settings.direction);
+      css(
+        bar,
+        this.barPositionCSS({
+          n: this.status || 0,
+          speed: this.settings.speed,
+          ease: this.settings.easing,
+          perc,
+        }),
+      );
+
       if (!this.settings.showSpinner) {
         const spinner = progress.querySelector(
           this.settings.spinnerSelector,
@@ -317,7 +322,7 @@ export class NProgress {
   }
 
   // Determine the CSS positioning method to use
-  static getPositioningCSS(): string {
+  static getPositioningCSS() {
     const bodyStyle = document.body.style;
     const vendorPrefix =
       'WebkitTransform' in bodyStyle
@@ -351,23 +356,35 @@ export class NProgress {
   }
 
   // Compute the CSS for positioning the bar
-  private static barPositionCSS(
-    n: number,
-    speed: number,
-    ease: string,
-  ): { [key: string]: string } {
+  private static barPositionCSS({
+    n,
+    speed,
+    ease,
+    perc,
+  }: {
+    n: number;
+    speed: number;
+    ease: string;
+    perc?: number;
+  }): { [key: string]: string } {
     let barCSS: { [key: string]: string } = {};
+
+    const computedPerc = perc ?? toBarPerc(n, this.settings.direction);
 
     if (this.settings.positionUsing === 'translate3d') {
       barCSS = {
-        transform: `translate3d(${toBarPerc(n, this.settings.direction)}%,0,0)`,
+        transform: `translate3d(${computedPerc}%,0,0)`,
       };
     } else if (this.settings.positionUsing === 'translate') {
       barCSS = {
-        transform: `translate(${toBarPerc(n, this.settings.direction)}%,0)`,
+        transform: `translate(${computedPerc}%,0)`,
       };
+    } else if (this.settings.positionUsing === 'width') {
+      barCSS = { width: `${computedPerc + 100}%` };
     } else {
-      barCSS = { 'margin-left': `${toBarPerc(n, this.settings.direction)}%` };
+      barCSS = {
+        'margin-left': `${computedPerc}%`,
+      };
     }
 
     barCSS.transition = `all ${speed}ms ${ease}`;

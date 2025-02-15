@@ -10,7 +10,7 @@ export interface NProgressOptions {
   trickleSpeed?: number;
   showSpinner?: boolean;
   parent?: HTMLElement | string;
-  positionUsing?: string;
+  positionUsing?: 'translate3d' | 'translate' | 'margin' | 'width' | null;
   barSelector?: string;
   spinnerSelector?: string;
   direction?: NProgressDirection;

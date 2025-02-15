@@ -1,5 +1,3 @@
-import type NProgress from './progress';
-
 export type NProgressDirection = 'ltr' | 'rtl';
 
 export interface NProgressOptions {
@@ -16,10 +14,4 @@ export interface NProgressOptions {
   barSelector?: string;
   spinnerSelector?: string;
   direction?: NProgressDirection;
-}
-
-declare global {
-  interface Window {
-    NProgress: NProgress;
-  }
 }

@@ -21,8 +21,9 @@
     <button id="inc-btn">Increment</button>
     <button id="done-btn">Done</button>
 
-    <script type="module" src="dist/index.mjs"></script>
     <script type="module">
+      import { NProgress } from './dist/index.mjs';
+
       NProgress.configure({
         template: null,
       });

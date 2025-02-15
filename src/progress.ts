@@ -368,6 +368,3 @@ export class NProgress {
     return barCSS;
   }
 }
-
-export default NProgress;
-window.NProgress = NProgress;

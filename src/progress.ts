@@ -380,14 +380,26 @@ export class NProgress {
         transform: `translate(${computedPerc}%,0)`,
       };
     } else if (this.settings.positionUsing === 'width') {
-      barCSS = { width: `${computedPerc + 100}%` };
-    } else {
       barCSS = {
-        'margin-left': `${computedPerc}%`,
+        width: `${
+          this.settings.direction === 'rtl'
+            ? 100 - computedPerc
+            : computedPerc + 100
+        }%`,
+        ...(this.settings.direction === 'rtl'
+          ? { right: '0', left: 'auto' }
+          : {}),
       };
+    } else {
+      barCSS =
+        this.settings.direction === 'rtl'
+          ? { 'margin-left': `${-computedPerc}%` }
+          : { 'margin-right': `${-computedPerc}%` };
     }
 
     barCSS.transition = `all ${speed}ms ${ease}`;
+
+    console.log('barCSS', barCSS);
 
     return barCSS;
   }

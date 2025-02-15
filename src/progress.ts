@@ -78,7 +78,9 @@ export class NProgress {
         css(bar, this.barPositionCSS(n, speed, ease));
       });
 
+      console.log('n:', n, 'this.settings.maximum:', this.settings.maximum);
       if (n === this.settings.maximum) {
+        console.log('n === this.settings.maximum');
         // When the bar reaches maximum, make it semi-transparent to indicate completion
         progressElements.forEach((progress) => {
           css(progress, { transition: 'none', opacity: '1' });
@@ -88,12 +90,18 @@ export class NProgress {
           progressElements.forEach((progress) => {
             css(progress, {
               transition: `all ${speed}ms linear`,
-              opacity: '0.5',
+              opacity: '0',
             });
           });
           setTimeout(() => {
             // Remove each progress element from the DOM
-            progressElements.forEach((progress) => this.remove(progress));
+            progressElements.forEach((progress) => {
+              this.remove(progress);
+              if (this.settings.template === null) {
+                css(progress, { transition: 'none', opacity: '1' });
+              }
+            });
+
             next();
           }, speed);
         }, speed);

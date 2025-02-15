@@ -8,7 +8,7 @@
   <body>
     <h1>NProgress Test</h1>
 
-    <div class="nprogress">
+    <div class="nprogress" style="display: none">
       <div class="bar" role="bar">
         <div class="peg"></div>
       </div>
@@ -44,13 +44,13 @@
           NProgress.done();
         });
 
-      window.addEventListener('load', function () {
-        NProgress.start();
+      // window.addEventListener('load', function () {
+      //   NProgress.start();
 
-        setTimeout(function () {
-          NProgress.done();
-        }, 2000);
-      });
+      //   setTimeout(function () {
+      //     NProgress.done();
+      //   }, 2000);
+      // });
     </script>
   </body>
 </html>

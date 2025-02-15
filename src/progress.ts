@@ -80,7 +80,6 @@ export class NProgress {
 
       console.log('n:', n, 'this.settings.maximum:', this.settings.maximum);
       if (n === this.settings.maximum) {
-        console.log('n === this.settings.maximum');
         // When the bar reaches maximum, make it semi-transparent to indicate completion
         progressElements.forEach((progress) => {
           css(progress, { transition: 'none', opacity: '1' });

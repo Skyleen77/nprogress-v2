@@ -1,6 +1,12 @@
 # NProgress V2
 
-**NProgress, which has not been maintained for over 4 years, requires a maintained V2 with recent code.**
+**NProgress V2 and Next NProgress Bar become BProgress!**
+
+The `nprogress-v2` and `next-nprogress-bar` packages remain available and usable in their current versions, but will no longer be maintained. We therefore advise you to migrate to [`@bprogress/core`](https://www.npmjs.com/package/@bprogress/core).
+
+## Migration to BProgress
+
+[Go to the migration documentation](https://bprogress.vercel.app/docs/migration)
 
 ## Installation
 

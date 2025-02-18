@@ -1,14 +1,15 @@
 {
   "name": "nprogress-v2",
-  "version": "1.1.8",
+  "version": "1.1.10",
   "description": "NProgress updated with additional functionality",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Skyleen77/nprogress-v2.git"
+    "url": "https://github.com/Skyleen77/bprogress.git"
   },
   "bugs": {
-    "url": "https://github.com/Skyleen77/nprogress-v2/issues"
+    "url": "https://github.com/Skyleen77/bprogress/issues"
   },
+  "homepage": "https://bprogress.vercel.app/",
   "author": "Skyleen",
   "license": "MIT",
   "main": "./dist/index.js",
